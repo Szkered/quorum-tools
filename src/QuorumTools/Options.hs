@@ -9,7 +9,7 @@ import           QuorumTools.Types
 consensusParser :: Parser Consensus
 consensusParser = opt parse "consensus" 'c' msg <|> pure Raft
   where
-    msg = "The consensus mechanism. One of [raft clique pow]. Default: raft"
+    msg = "The consensus mechanism. One of [raft clique pow istanbul]. Default: raft"
 
     parse :: Text -> Maybe Consensus
     parse "raft"     = Just Raft
