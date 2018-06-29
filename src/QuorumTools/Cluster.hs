@@ -101,6 +101,7 @@ usingConsensus Clique env = env
   & clusterPrivacySupport  .~ PrivacyDisabled
   & clusterMode            .~ EthereumMode
   & withInitialBalances
+usingConsensus Istanbul env = env & clusterConsensusConfig .~ IstanbulConfig 30000 0
 
 mkClusterEnv :: (GethId -> Ip)
              -> (GethId -> DataDir)
@@ -205,6 +206,7 @@ gethCommand geth more = format (s%" geth --datadir "%fp                    %
         JoinNewCluster -> format ("--raft --raftport "%d) port
     consensusOptions CliquePeer = "--mine"
     consensusOptions PowPeer = "--mine"
+    consensusOptions IstanbulPeer = "--mine --syncmode full"
 
 initNode :: (MonadIO m, MonadError ProvisionError m, HasEnv m)
          => FilePath
@@ -336,6 +338,7 @@ mkConsensusPeer gid _ (RaftConfig basePort) =
   RaftPeer $ basePort + fromIntegral (gId gid)
 mkConsensusPeer _ _ (CliqueConfig _) = CliquePeer
 mkConsensusPeer _ _  PowConfig = PowPeer
+mkConsensusPeer _ _  (IstanbulConfig _ _ ) = IstanbulPeer
 
 mkGeth :: (MonadIO m, HasEnv m) => GethId -> EnodeId -> m Geth
 mkGeth gid eid = do

@@ -12,7 +12,8 @@ consensusParser = opt parse "consensus" 'c' msg <|> pure Raft
     msg = "The consensus mechanism. One of [raft clique pow]. Default: raft"
 
     parse :: Text -> Maybe Consensus
-    parse "raft"   = Just Raft
-    parse "clique" = Just Clique
-    parse "pow"    = Just ProofOfWork
-    parse _        = Nothing
+    parse "raft"     = Just Raft
+    parse "clique"   = Just Clique
+    parse "pow"      = Just ProofOfWork
+    parse "istanbul" = Just Istanbul
+    parse _          = Nothing

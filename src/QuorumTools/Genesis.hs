@@ -48,7 +48,12 @@ createGenesisJson = do
                                     , "epoch"  .= i 30000
                                     ]
                                   ]
-                PowConfig -> [])
+                PowConfig -> []
+                IstanbulConfig _epoch _policy -> [ "istanbul" .= object
+                                                   [ "epoch"  .= getEpoch _epoch
+                                                   , "policy" .= getPolicy _policy
+                                                   ]
+                                                 ])
       , "difficulty" .= t "0x0"
       , "extraData"  .=
         case consenCfg of
@@ -58,6 +63,7 @@ createGenesisJson = do
               <> foldMap (printHex WithoutPrefix . unAddr . accountId) addrs
               <> T.replicate (65 * 2) "0"
           PowConfig -> empty32
+          IstanbulConfig _ _ -> "0x0000000000000000000000000000000000000000000000000000000000000000f897f893946571d97f340c8495b661a823f2c2145ca47d63c2948157d4437104e3b8df4451a85f7b2438ef6699ff94b131288f355bc27090e542ae0be213c20350b76794b912de287f9b047b4228436e94b5b78e3ee1617194d8dba507e85f116b1f7e231ca8525fc9008a696694e36cbeb565b061217930767886474e3cde903ac594f512a992f3fb749857d758ffda1330e590fa915e80c0"
       , "gasLimit"   .= t "0xE0000000"
       , "mixhash"    .= empty32
       , "nonce"      .= t "0x0"
