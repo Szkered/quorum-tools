@@ -51,6 +51,12 @@ newtype Seconds = Seconds Int deriving Num
 newtype Port = Port { getPort :: Int }
   deriving (Eq, Show, Enum, Ord, Num, Real, Integral)
 
+newtype Epoch = Epoch { getEpoch :: Int }
+  deriving (Eq, Show, Enum, Ord, Num, Real, Integral)
+
+newtype Policy = Policy { getPolicy :: Int }
+  deriving (Eq, Show, Enum, Ord, Num, Real, Integral)
+
 newtype Ip = Ip { getIp :: Text }
   deriving (Eq, Show)
 
@@ -69,18 +75,22 @@ data Consensus
   = Raft
   | Clique
   | ProofOfWork
+  | Istanbul
   deriving (Eq, Show)
 
 data ConsensusConfig
   = RaftConfig { _raftBasePort :: Port }
   | CliqueConfig { _cliqueSigners :: [AccountId] }
   | PowConfig
+  | IstanbulConfig { _epoch  :: Epoch
+                   , _policy :: Policy}
   deriving (Eq, Show)
 
 data ConsensusPeer
   = RaftPeer Port
   | CliquePeer
   | PowPeer
+  | IstanbulPeer
   deriving (Eq, Show)
 
 data PrivacySupport
