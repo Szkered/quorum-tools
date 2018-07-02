@@ -101,7 +101,7 @@ usingConsensus Clique env = env
   & clusterPrivacySupport  .~ PrivacyDisabled
   & clusterMode            .~ EthereumMode
   & withInitialBalances
-usingConsensus Istanbul env = env & clusterConsensusConfig .~ IstanbulConfig 30000 0
+usingConsensus Istanbul env = env & clusterConsensusConfig .~ IstanbulConfig 30000 0 (envAccountKeys env)
 
 mkClusterEnv :: (GethId -> Ip)
              -> (GethId -> DataDir)
@@ -338,7 +338,7 @@ mkConsensusPeer gid _ (RaftConfig basePort) =
   RaftPeer $ basePort + fromIntegral (gId gid)
 mkConsensusPeer _ _ (CliqueConfig _) = CliquePeer
 mkConsensusPeer _ _  PowConfig = PowPeer
-mkConsensusPeer _ _  (IstanbulConfig _ _ ) = IstanbulPeer
+mkConsensusPeer _ _  (IstanbulConfig _ _ _ ) = IstanbulPeer
 
 mkGeth :: (MonadIO m, HasEnv m) => GethId -> EnodeId -> m Geth
 mkGeth gid eid = do

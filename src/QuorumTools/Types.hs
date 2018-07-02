@@ -82,8 +82,9 @@ data ConsensusConfig
   = RaftConfig { _raftBasePort :: Port }
   | CliqueConfig { _cliqueSigners :: [AccountId] }
   | PowConfig
-  | IstanbulConfig { _epoch  :: Epoch
-                   , _policy :: Policy}
+  | IstanbulConfig { _epoch      :: Epoch
+                   , _policy     :: Policy
+                   , _validators :: [AccountId]}
   deriving (Eq, Show)
 
 data ConsensusPeer
