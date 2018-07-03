@@ -17,22 +17,26 @@ import           QuorumTools.Util
 
 import Blockchain.Data.RLP
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Builder as Builder
 import qualified Data.ByteString.Base16 as B16
-import Numeric
+import qualified Data.ByteString.Lazy.Char8 as Char8
 import Data.Text.Encoding (encodeUtf8)
 
-prettyPrint :: B.ByteString -> Text
-prettyPrint = T.pack . concat . map (flip showHex "") . B.unpack
+rlpDeserializeHex :: B.ByteString -> Text
+rlpDeserializeHex = T.pack . Char8.unpack . Builder.toLazyByteString . Builder.byteStringHex
 
 accountIdToHex :: AccountId -> Text
 accountIdToHex = printHex WithoutPrefix . unAddr . accountId
 
 calcExtraData :: [Text] -> Text
-calcExtraData addrs = prettyPrint . rlpSerialize $ extraData
+calcExtraData addrs = t $ "0x"
+                        <> T.replicate (32 * 2) "0"
+                        <> (rlpDeserializeHex . rlpSerialize $ extraData)
   where validators_   = RLPArray $ map (rlpEncode . fst . B16.decode . encodeUtf8) addrs
         seal          = rlpDeserialize . fst . B16.decode $ "b8410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         committedSeal = RLPArray []
         extraData     = RLPArray [validators_, seal, committedSeal]
+        t = id :: Text -> Text
 
 createGenesisJson :: (MonadIO m, HasEnv m) => m FilePath
 createGenesisJson = do
@@ -87,10 +91,7 @@ createGenesisJson = do
               <> foldMap accountIdToHex addrs
               <> T.replicate (65 * 2) "0"
           PowConfig -> empty32
-          IstanbulConfig _ _ addrs ->
-            t $ "0x"
-              <> T.replicate (32 * 2) "0"
-              <> (calcExtraData $ map accountIdToHex addrs)
+          IstanbulConfig _ _ addrs -> calcExtraData $ map accountIdToHex addrs
       , "gasLimit"   .= t "0xE0000000"
       , "mixhash"    .=
         case consenCfg of
