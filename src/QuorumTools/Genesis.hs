@@ -59,8 +59,8 @@ createGenesisJson = do
             (Map.toList bals) :: Value)
       , "coinbase"   .= addrToText def
       , "config"     .= object
-        ([ "homesteadBlock" .= i 1
-         , "chainId"        .= i 1
+        ([ "byzantiumBlock" .= i 1
+         , "chainId"        .= i 10
          , "eip155Block"    .= i 3
          , "eip158Block"    .= i 3
          , "isQuorum"       .= (mode == QuorumMode)

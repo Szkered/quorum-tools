@@ -101,7 +101,9 @@ usingConsensus Clique env = env
   & clusterPrivacySupport  .~ PrivacyDisabled
   & clusterMode            .~ EthereumMode
   & withInitialBalances
-usingConsensus Istanbul env = env & clusterConsensusConfig .~ IstanbulConfig 30000 0 (envAccountKeys env)
+usingConsensus Istanbul env = env
+  & clusterConsensusConfig .~ IstanbulConfig 30000 0 (envAccountKeys env)
+  & withInitialBalances
 
 mkClusterEnv :: (GethId -> Ip)
              -> (GethId -> DataDir)
@@ -215,6 +217,12 @@ initNode :: (MonadIO m, MonadError ProvisionError m, HasEnv m)
 initNode genesisJsonPath gid = do
   cmd <- setupCommand gid <*> pure (format ("init "%fp) genesisJsonPath)
   (exitCode, _, stdErr) <- shellStrictWithErr cmd empty
+  case exitCode of
+    ExitSuccess -> return ()
+    ExitFailure _ -> throwError $ GethInitFailed exitCode stdErr
+
+generateNodeKey dir = do
+  (exitCode, _, stdErr) <- shellStrictWithErr $ rawCommand dir
   case exitCode of
     ExitSuccess -> return ()
     ExitFailure _ -> throwError $ GethInitFailed exitCode stdErr
